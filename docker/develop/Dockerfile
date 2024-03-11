@@ -3,7 +3,7 @@ ARG ALPINE_VERSION=3.18
 
 FROM golang:${GO_VERSION}-alpine${ALPINE_VERSION}
 
-WORKDIR /go/src/c3-tutorial
+WORKDIR /go/src/techer-me-backend
 
 RUN apk update && apk add git
 RUN go install github.com/cosmtrek/air@latest
