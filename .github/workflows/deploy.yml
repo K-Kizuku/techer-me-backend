@@ -1,0 +1,68 @@
+name: Run Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  REGION: ${{ secrets.REGION }}
+  IDENTITY_PROVIDER: ${{ secrets.IDENTITY_PROVIDER }}
+  SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+  GAR_LOCATION: ${{ secrets.GAR_LOCATION }}
+  GAR_REPOSITORY: ${{ secrets.GAR_REPOSITORY }}
+  GAR_IMAGE: ${{ secrets.GAR_IMAGE }}
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  CLOUD_RUN_SERVICE: ${{ secrets.CLOUD_RUN_SERVICE }}
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        id: auth
+        with:
+          token_format: "access_token"
+          workload_identity_provider: ${{ env.IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
+
+      - name: "Set up Cloud SDK"
+        uses: "google-github-actions/setup-gcloud@v2"
+        with:
+          version: ">= 363.0.0"
+
+      - name: Docker Auth
+        id: docker-auth
+        uses: "docker/login-action@v1"
+        with:
+          username: "oauth2accesstoken"
+          password: "${{ steps.auth.outputs.access_token }}"
+          registry: ${{ env.GAR_LOCATION }}
+
+      - name: Build
+        run: docker build -f docker/production/Dockerfile -t ${{ env.GAR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.GAR_IMAGE }}:${{ github.sha }} .
+
+      - name: Push
+        run: |
+          docker push ${{ env.GAR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.GAR_IMAGE }}:${{ github.sha }}
+
+      - name: Deploy to CloudRun
+        id: deploy
+        run: |-
+          gcloud run deploy ${{ env.CLOUD_RUN_SERVICE }} \
+            --image ${{ env.GAR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.GAR_IMAGE }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --project ${{ env.PROJECT_ID }} \
+            --service-account=${{ env.SERVICE_ACCOUNT }} \
+            --allow-unauthenticated \
+            --min-instances=1 \
+            --max-instances=5 \
