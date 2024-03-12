@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	database "github.com/K-Kizuku/techer-me-backend/pkg/db"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -19,10 +21,25 @@ func main() {
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
+	e.Use(middleware.Gzip())
+
+	// db init
+	db, err := database.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// health check
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
+	})
+
+	e.GET("/ping", func(c echo.Context) error {
+		err := db.Ping()
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+		return c.String(http.StatusOK, "pong")
 	})
 
 	// start server
