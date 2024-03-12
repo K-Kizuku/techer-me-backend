@@ -18,7 +18,7 @@ var (
 
 // .envを呼び出します。
 func LoadEnv() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load()
 
 	if err != nil {
 		log.Printf("読み込み出来ませんでした: %v", err)
