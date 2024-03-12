@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/K-Kizuku/techer-me-backend/pkg/config"
 	database "github.com/K-Kizuku/techer-me-backend/pkg/db"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -22,6 +23,8 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.CORS())
 	e.Use(middleware.Gzip())
+
+	config.LoadEnv()
 
 	// db init
 	db, err := database.Init()
