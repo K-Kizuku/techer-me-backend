@@ -41,8 +41,9 @@ func main() {
 
 	mux.Handle("POST /users", handler.AppHandler(h.UserHandler.CreateUserByFirebaseID()))
 
-	c := cors.AllowAll()
+	mux.Handle("GET /me", middleware.FirebaseAuth(handler.AppHandler(h.UserHandler.GetMe())))
 
+	c := cors.AllowAll()
 	handler := middleware.Chain(mux, middleware.Context, c.Handler, middleware.Recover, middleware.Logger)
 
 	server := &http.Server{

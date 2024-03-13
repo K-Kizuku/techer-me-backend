@@ -58,7 +58,7 @@ func (r *repository) CreateDetail(ctx context.Context, user *entity.User) error 
 	}
 
 	_, err = r.conn.NamedExecContext(ctx, `
-		INSERT INTO user_detail (user_id, name, is_organizer, image_url, message, skills, urls)
+		INSERT INTO user_details (user_id, name, is_organizer, image_url, message, skills, urls)
 		VALUES (:user_id, :name, :is_organizer, :image_url, :message, :skills, :urls)
 	`, u)
 
@@ -69,8 +69,43 @@ func (r *repository) CreateDetail(ctx context.Context, user *entity.User) error 
 }
 
 func (r *repository) SelectByID(ctx context.Context, userID string) (*entity.User, error) {
-	return nil, nil
+	var u dto.User
+	if err := r.conn.QueryRowxContext(ctx, `
+			SELECT user_id, name, is_organizer, image_url, urls, skills, message FROM user_details WHERE user_id = ?
+		`, userID).StructScan(&u); err != nil {
+		return nil, err
+	}
+
+	urls := make(map[entity.URLs]string)
+	if err := json.Unmarshal([]byte(u.URLs), &urls); err != nil {
+		return nil, err
+	}
+
+	skills := make(map[string]string)
+	if err := json.Unmarshal([]byte(u.Skills), &skills); err != nil {
+		return nil, err
+	}
+
+	var message string
+	if u.Message.Valid {
+		message = ""
+	} else {
+		message = u.Message.V
+	}
+
+	user := &entity.User{
+		ID:          u.UserID,
+		Name:        u.Name,
+		IsOrganizer: u.IsOrganizer,
+		ImageURL:    u.ImageURL,
+		Message:     message,
+		Skills:      skills,
+		URLs:        urls,
+	}
+
+	return user, nil
 }
+
 func (r *repository) Update(ctx context.Context, user *entity.User) error {
 	return nil
 }
