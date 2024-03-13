@@ -1,16 +1,25 @@
-package database
+package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"log"
 	"net"
 
 	"cloud.google.com/go/cloudsqlconn"
 	"github.com/K-Kizuku/techer-me-backend/pkg/config"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/pkg/errors"
 )
+
+func New() *sqlx.DB {
+	db, err := Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db
+}
 
 func Init() (*sqlx.DB, error) {
 	if config.Mode == "dev" {
