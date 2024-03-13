@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 	"net/http"
 	"os"
@@ -14,6 +13,7 @@ import (
 	"github.com/K-Kizuku/techer-me-backend/internal/di"
 	"github.com/K-Kizuku/techer-me-backend/pkg/config"
 	"github.com/K-Kizuku/techer-me-backend/pkg/handler"
+	"github.com/K-Kizuku/techer-me-backend/pkg/log"
 	"github.com/K-Kizuku/techer-me-backend/pkg/middleware"
 	"github.com/rs/cors"
 )
@@ -50,7 +50,7 @@ func main() {
 		Handler: handler,
 	}
 	go func() {
-		slog.Info("Starting server on :8080")
+		log.Start()
 		if err := server.ListenAndServe(); err != nil {
 			slog.Error("server error", "error", err.Error())
 		}
@@ -84,6 +84,6 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
-		log.Fatal(err)
+		slog.Error("server error", "error", err.Error())
 	}
 }
