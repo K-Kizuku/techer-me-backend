@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: docker/develop/Dockerfile
     volumes:
-      - ./:/go/src/c3-tutorial-server
+      - ./:/go/src/techer-me-backend
     ports:
       - "8080:8080"
     env_file:
