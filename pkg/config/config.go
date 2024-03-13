@@ -8,12 +8,13 @@ import (
 )
 
 var (
-	DB_DSN                 string
-	DBUser                 string
-	DBPassword             string
-	DBName                 string
-	InstanceConnectionName string
-	Mode                   string
+	DB_DSN                       string
+	DBUser                       string
+	DBPassword                   string
+	DBName                       string
+	InstanceConnectionName       string
+	Mode                         string
+	GoogleApplicationCredentials string
 )
 
 // .envを呼び出します。
@@ -30,4 +31,5 @@ func LoadEnv() {
 	DBName = os.Getenv("DB_NAME")
 	InstanceConnectionName = os.Getenv("INSTANCE_CONNECTION_NAME")
 	Mode = os.Getenv("MODE")
+	GoogleApplicationCredentials = os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
 }

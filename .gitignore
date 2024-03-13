@@ -21,3 +21,7 @@
 go.work
 
 .env
+
+firebase-sdk.json
+key.json
+cloud-sql-proxy

@@ -20,6 +20,7 @@ env:
   MYSQL_USER: ${{ secrets.MYSQL_USER }}
   MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
   MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+  FIREBASE_SDK_KEY: ${{ secrets.FIREBASE_SDK_KEY }}
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -53,7 +54,9 @@ jobs:
           registry: ${{ env.GAR_LOCATION }}
 
       - name: Build
-        run: docker build -f docker/production/Dockerfile -t ${{ env.GAR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.GAR_IMAGE }}:${{ github.sha }} .
+        run: |
+          echo '${{ env.FIREBASE_SDK_KEY }}' > firebase-sdk.json
+          docker build -f docker/production/Dockerfile -t ${{ env.GAR_LOCATION }}/${{ env.PROJECT_ID }}/${{ env.GAR_REPOSITORY }}/${{ env.GAR_IMAGE }}:${{ github.sha }} .
 
       - name: Push
         run: |

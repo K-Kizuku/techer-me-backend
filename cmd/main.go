@@ -39,7 +39,7 @@ func main() {
 	// 	fmt.Fprint(w, "pong")
 	// })
 
-	mux.Handle("POST /user/create", handler.AppHandler(h.UserHandler.CreateUserByFirebaseID()))
+	mux.Handle("POST /users", handler.AppHandler(h.UserHandler.CreateUserByFirebaseID()))
 
 	c := cors.AllowAll()
 
@@ -55,27 +55,6 @@ func main() {
 			slog.Error("server error", "error", err.Error())
 		}
 	}()
-
-	// e := echo.New()
-
-	// // middleware
-	// e.Use(middleware.Recover())
-	// e.Use(middleware.Logger())
-	// e.Use(middleware.CORS())
-	// e.Use(middleware.Gzip())
-
-	// // health check
-	// e.GET("/", func(c echo.Context) error {
-	// 	return c.String(http.StatusOK, "Hello, World!")
-	// })
-
-	// e.GET("/ping", func(c echo.Context) error {
-	// 	err := db.Ping()
-	// 	if err != nil {
-	// 		return c.String(http.StatusInternalServerError, err.Error())
-	// 	}
-	// 	return c.String(http.StatusOK, "pong")
-	// })
 
 	// graceful shutdown
 	quit := make(chan os.Signal, 1)
