@@ -1,4 +1,4 @@
-.PHONY: lint lint-fix run logs migrate migrate-down gen-migrate
+.PHONY: lint lint-fix run logs migrate migrate-down gen-migrate cloud-sql-proxy
 
 lint:
 	golangci-lint run ./...
@@ -30,4 +30,4 @@ setup-proxy:
 	rm cloud-sql-proxy
 
 cloud-sql-proxy:
-	cloud_sql_proxy -instances=hacku-416915:asia-northeast1:hacku-mysql=tcp:0.0.0.0:3306 -credential_file=key.json
+	cloud_sql_proxy hacku-416915:asia-northeast1:hacku-mysql=tcp:0.0.0.0:3306 --credential-file=key.json
