@@ -10,14 +10,33 @@ import (
 	"syscall"
 	"time"
 
+	_ "github.com/K-Kizuku/techer-me-backend/docs"
 	"github.com/K-Kizuku/techer-me-backend/internal/di"
 	"github.com/K-Kizuku/techer-me-backend/pkg/config"
 	"github.com/K-Kizuku/techer-me-backend/pkg/handler"
 	"github.com/K-Kizuku/techer-me-backend/pkg/log"
 	"github.com/K-Kizuku/techer-me-backend/pkg/middleware"
 	"github.com/rs/cors"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
+// @title Swagger Example API
+// @version 1.0
+// @description This is a sample server Petstore server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /
+// @SecurityDefinitions.apiKey Bearer
+// @in header
+// @name Authorization
 func main() {
 	config.LoadEnv()
 
@@ -28,6 +47,10 @@ func main() {
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Hello, World")
 	})
+
+	mux.HandleFunc("GET /swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"), //The url pointing to API definition
+	))
 
 	// mux.HandleFunc("GET /ping", func(w http.ResponseWriter, r *http.Request) {
 	// 	err := db.Ping()
@@ -42,6 +65,8 @@ func main() {
 	mux.Handle("POST /users", handler.AppHandler(h.UserHandler.CreateUserByFirebaseID()))
 
 	mux.Handle("GET /me", middleware.FirebaseAuth(handler.AppHandler(h.UserHandler.GetMe())))
+
+	mux.Handle("POST /exchanges", middleware.FirebaseAuth(handler.AppHandler(h.ExchangeHandler.CreateExchange())))
 
 	c := cors.AllowAll()
 	handler := middleware.Chain(mux, middleware.Context, c.Handler, middleware.Recover, middleware.Logger)

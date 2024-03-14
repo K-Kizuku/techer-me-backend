@@ -42,6 +42,18 @@ func (h *Handler) CreateUserByFirebaseID() func(http.ResponseWriter, *http.Reque
 	}
 }
 
+// @Summary Get user information
+// @Description Get the information of the authenticated user
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} schema.GetMeOutput "OK"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Security Bearer
+// @Router /me [get]
 func (h *Handler) GetMe() func(http.ResponseWriter, *http.Request) error {
 	return func(w http.ResponseWriter, r *http.Request) error {
 
