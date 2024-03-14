@@ -34,8 +34,17 @@ func (r *repository) Create(ctx context.Context, id string) error {
 }
 
 func (r *repository) CreateDetail(ctx context.Context, user *entity.User) error {
-	urls := "{}"
-	skills := "{}"
+	urls := make(map[string]string)
+	urlsJSON, err := json.Marshal(urls)
+	if err != nil {
+		return err
+	}
+
+	skills := make(map[string]string)
+	skillsJSON, err := json.Marshal(skills)
+	if err != nil {
+		return err
+	}
 
 	var message sql.Null[string]
 	message.V = user.Message
@@ -45,14 +54,14 @@ func (r *repository) CreateDetail(ctx context.Context, user *entity.User) error 
 		Name:     user.Name,
 		ImageURL: user.ImageURL,
 		Message:  message,
-		Skills:   string(skills),
-		URLs:     string(urls),
+		Skills:   string(skillsJSON),
+		URLs:     string(urlsJSON),
 	}
 
-	_, err := r.conn.NamedExecContext(ctx, `
-        INSERT INTO user_details (user_id, name, image_url, message, skills, urls)
-        VALUES (:user_id, :name, :image_url, :message, :skills, :urls)
-    `, u)
+	_, err = r.conn.NamedExecContext(ctx, `
+		INSERT INTO user_details (user_id, name, image_url, message, skills, urls)
+		VALUES (:user_id, :name, :image_url, :message, :skills, :urls)
+	`, u)
 
 	if err != nil {
 		return err
