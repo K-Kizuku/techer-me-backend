@@ -9,6 +9,20 @@ definitions:
       user_id_2:
         type: string
     type: object
+  schema.Exchange:
+    properties:
+      event_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  schema.GetExchangesOutput:
+    properties:
+      exchanges:
+        items:
+          $ref: '#/definitions/schema.Exchange'
+        type: array
+    type: object
   schema.GetMeOutput:
     properties:
       image_url:
@@ -45,6 +59,30 @@ info:
   version: "1.0"
 paths:
   /exchanges:
+    get:
+      consumes:
+      - application/json
+      description: 名刺交換の一覧を取得するためのエンドポイント
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.GetExchangesOutput'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: 交換した名刺一覧取得
+      tags:
+      - Exchange
     post:
       consumes:
       - application/json
@@ -81,14 +119,14 @@ paths:
             type: string
       security:
       - Bearer: []
-      summary: Create Exchange
+      summary: 名刺交換
       tags:
       - Exchange
   /me:
     get:
       consumes:
       - application/json
-      description: Get the information of the authenticated user
+      description: 自分の情報を取得する
       produces:
       - application/json
       responses:
@@ -114,7 +152,7 @@ paths:
             type: string
       security:
       - Bearer: []
-      summary: Get user information
+      summary: 自分の情報
       tags:
       - User
 securityDefinitions:

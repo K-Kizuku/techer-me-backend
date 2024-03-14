@@ -38,8 +38,8 @@ func (h *Handler) CreateUserByFirebaseID() func(http.ResponseWriter, *http.Reque
 	}
 }
 
-// @Summary Get user information
-// @Description Get the information of the authenticated user
+// @Summary 自分の情報
+// @Description 自分の情報を取得する
 // @Tags User
 // @Accept json
 // @Produce json
