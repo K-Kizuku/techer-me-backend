@@ -1,4 +1,4 @@
-.PHONY: lint lint-fix run logs migrate migrate-down gen-migrate cloud-sql-proxy
+.PHONY: lint lint-fix run logs migrate migrate-down gen-migrate cloud-sql-proxy swag
 
 lint:
 	golangci-lint run ./...
@@ -31,3 +31,9 @@ setup-proxy:
 
 cloud-sql-proxy:
 	cloud_sql_proxy hacku-416915:asia-northeast1:hacku-mysql=tcp:0.0.0.0:3306 --credential-file=key.json
+
+swag:
+	swag init -g ./cmd/main.go
+
+wire:
+	wire gen ./internal/di/wire.go 

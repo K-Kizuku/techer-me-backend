@@ -8,8 +8,11 @@ package di
 
 import (
 	"github.com/K-Kizuku/techer-me-backend/internal/app/handler"
+	exchange3 "github.com/K-Kizuku/techer-me-backend/internal/app/handler/exchange"
 	user3 "github.com/K-Kizuku/techer-me-backend/internal/app/handler/user"
+	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/exchange"
 	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/user"
+	exchange2 "github.com/K-Kizuku/techer-me-backend/internal/app/service/exchange"
 	user2 "github.com/K-Kizuku/techer-me-backend/internal/app/service/user"
 	"github.com/K-Kizuku/techer-me-backend/pkg/db"
 )
@@ -21,6 +24,9 @@ func InitHandler() *handler.Root {
 	iRepository := user.New(sqlxDB)
 	iUserService := user2.New(iRepository)
 	userHandler := user3.New(iUserService)
-	root := handler.New(userHandler)
+	exchangeIRepository := exchange.New(sqlxDB)
+	iExchangeService := exchange2.New(exchangeIRepository)
+	exchangeHandler := exchange3.New(iExchangeService)
+	root := handler.New(userHandler, exchangeHandler)
 	return root
 }
