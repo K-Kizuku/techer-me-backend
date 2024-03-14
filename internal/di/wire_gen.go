@@ -8,10 +8,13 @@ package di
 
 import (
 	"github.com/K-Kizuku/techer-me-backend/internal/app/handler"
+	event3 "github.com/K-Kizuku/techer-me-backend/internal/app/handler/event"
 	exchange3 "github.com/K-Kizuku/techer-me-backend/internal/app/handler/exchange"
 	user3 "github.com/K-Kizuku/techer-me-backend/internal/app/handler/user"
+	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/event"
 	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/exchange"
 	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/user"
+	event2 "github.com/K-Kizuku/techer-me-backend/internal/app/service/event"
 	exchange2 "github.com/K-Kizuku/techer-me-backend/internal/app/service/exchange"
 	user2 "github.com/K-Kizuku/techer-me-backend/internal/app/service/user"
 	"github.com/K-Kizuku/techer-me-backend/pkg/db"
@@ -27,6 +30,9 @@ func InitHandler() *handler.Root {
 	exchangeIRepository := exchange.New(sqlxDB)
 	iExchangeService := exchange2.New(exchangeIRepository)
 	exchangeHandler := exchange3.New(iExchangeService)
-	root := handler.New(userHandler, exchangeHandler)
+	eventIRepository := event.New(sqlxDB)
+	iEventService := event2.New(eventIRepository)
+	eventHandler := event3.New(iEventService)
+	root := handler.New(userHandler, exchangeHandler, eventHandler)
 	return root
 }

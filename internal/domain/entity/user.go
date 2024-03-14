@@ -8,6 +8,7 @@ type User struct {
 	Message     string
 	Skills      map[string]string
 	URLs        map[URLs]string
+	Events      []Event
 }
 
 type URLs int
