@@ -9,10 +9,57 @@ definitions:
       user_id_2:
         type: string
     type: object
+  schema.Event:
+    properties:
+      event_id:
+        type: string
+      finished_at:
+        type: string
+      image_url:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      owner_id:
+        type: string
+      started_at:
+        type: string
+    type: object
   schema.Exchange:
     properties:
       event_id:
         type: string
+      user_id:
+        type: string
+    type: object
+  schema.GetByIDInput:
+    properties:
+      user_id:
+        type: string
+    type: object
+  schema.GetByIDOutput:
+    properties:
+      events:
+        items:
+          $ref: '#/definitions/schema.Event'
+        type: array
+      image_url:
+        type: string
+      is_organizer:
+        type: boolean
+      message:
+        type: string
+      name:
+        type: string
+      skills:
+        additionalProperties:
+          type: string
+        type: object
+      urls:
+        additionalProperties:
+          type: string
+        type: object
       user_id:
         type: string
     type: object
@@ -25,6 +72,10 @@ definitions:
     type: object
   schema.GetMeOutput:
     properties:
+      events:
+        items:
+          $ref: '#/definitions/schema.Event'
+        type: array
       image_url:
         type: string
       is_organizer:
@@ -153,6 +204,46 @@ paths:
       security:
       - Bearer: []
       summary: 自分の情報
+      tags:
+      - User
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: 指定したユーザーの情報を取得する
+      parameters:
+      - description: ユーザーID
+        in: body
+        name: id
+        required: true
+        schema:
+          $ref: '#/definitions/schema.GetByIDInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.GetByIDOutput'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: ユーザー情報取得
       tags:
       - User
 securityDefinitions:

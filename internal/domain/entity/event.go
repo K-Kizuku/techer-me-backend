@@ -1,10 +1,11 @@
 package entity
 
 type Event struct {
-	ID        int
-	Name      string
-	StartedAt string
-	EndedAt   string
-	message   string
-	ImageURL  string
+	ID         string
+	Name       string
+	OwnerID    string
+	StartedAt  string
+	FinishedAt string
+	Message    string
+	ImageURL   string
 }

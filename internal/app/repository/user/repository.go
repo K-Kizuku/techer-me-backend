@@ -89,11 +89,41 @@ func (r *repository) SelectByID(ctx context.Context, userID string) (*entity.Use
 		return nil, errors.New(http.StatusInternalServerError, err)
 	}
 
-	var message string
+	var userMessage string
 	if u.Message.Valid {
-		message = ""
+		userMessage = ""
 	} else {
-		message = u.Message.V
+		userMessage = u.Message.V
+	}
+
+	events := make([]entity.Event, 0)
+
+	rows, err := r.conn.QueryxContext(ctx, `
+	SELECT event_id, owner_id, started_at, finished_at, message, image_url FROM event_details JOIN participants USING(event_id) WHERE user_id = ?;
+	`, userID)
+	if err != nil {
+		return nil, errors.HandleError(err)
+	}
+	for rows.Next() {
+		var e dto.Event
+		if err := rows.StructScan(&e); err != nil {
+			return nil, errors.New(http.StatusInternalServerError, err)
+		}
+		var eventMessage string
+		if e.Message.Valid {
+			eventMessage = ""
+		} else {
+			eventMessage = e.Message.V
+		}
+		events = append(events, entity.Event{
+			ID:         e.EventID,
+			Name:       e.Name,
+			OwnerID:    e.OwnerID,
+			StartedAt:  e.StartedAt,
+			FinishedAt: e.FinishedAt,
+			Message:    eventMessage,
+			ImageURL:   e.ImageURL,
+		})
 	}
 
 	user := &entity.User{
@@ -101,9 +131,10 @@ func (r *repository) SelectByID(ctx context.Context, userID string) (*entity.Use
 		Name:        u.Name,
 		IsOrganizer: u.IsOrganizer,
 		ImageURL:    u.ImageURL,
-		Message:     message,
+		Message:     userMessage,
 		Skills:      skills,
 		URLs:        urls,
+		Events:      events,
 	}
 
 	return user, nil

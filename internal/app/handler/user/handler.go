@@ -63,6 +63,19 @@ func (h *Handler) GetMe() func(http.ResponseWriter, *http.Request) error {
 		if err != nil {
 			return err
 		}
+		var events []schema.Event
+		for _, event := range user.Events {
+			events = append(events, schema.Event{
+				EventID:    event.ID,
+				Name:       event.Name,
+				OwnerID:    event.OwnerID,
+				StartedAt:  event.StartedAt,
+				FinishedAt: event.FinishedAt,
+				Message:    event.Message,
+				ImageURL:   event.ImageURL,
+			})
+		}
+
 		res := schema.GetMeOutput{
 			UserID:      user.ID,
 			Name:        user.Name,
@@ -71,10 +84,64 @@ func (h *Handler) GetMe() func(http.ResponseWriter, *http.Request) error {
 			Message:     user.Message,
 			Skills:      user.Skills,
 			URLs:        user.URLs,
+			Events:      events,
 		}
 		if err := json.NewEncoder(w).Encode(res); err != nil {
 			return errors.New(http.StatusInternalServerError, err)
 		}
 		return nil
 	}
+}
+
+// @Summary ユーザー情報取得
+// @Description 指定したユーザーの情報を取得する
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param id body schema.GetByIDInput true "ユーザーID"
+// @Success 200 {object} schema.GetByIDOutput "OK"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Security Bearer
+// @Router /user [get]
+func (h *Handler) GetByID() func(http.ResponseWriter, *http.Request) error {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		var req schema.GetByIDInput
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			return errors.New(http.StatusBadRequest, err)
+		}
+		user, err := h.userService.GetByID(r.Context(), req.UserID)
+		if err != nil {
+			return err
+		}
+		var events []schema.Event
+		for _, event := range user.Events {
+			events = append(events, schema.Event{
+				EventID:    event.ID,
+				Name:       event.Name,
+				OwnerID:    event.OwnerID,
+				StartedAt:  event.StartedAt,
+				FinishedAt: event.FinishedAt,
+				Message:    event.Message,
+				ImageURL:   event.ImageURL,
+			})
+		}
+		res := schema.GetByIDOutput{
+			UserID:      user.ID,
+			Name:        user.Name,
+			IsOrganizer: user.IsOrganizer,
+			ImageURL:    user.ImageURL,
+			Message:     user.Message,
+			Skills:      user.Skills,
+			URLs:        user.URLs,
+			Events:      events,
+		}
+		if err := json.NewEncoder(w).Encode(res); err != nil {
+			return errors.New(http.StatusInternalServerError, err)
+		}
+		return nil
+	}
+
 }
