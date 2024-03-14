@@ -25,6 +25,44 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/exchanges": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "名刺交換の一覧を取得するためのエンドポイント",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "交換した名刺一覧取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schema.GetExchangesOutput"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -41,7 +79,7 @@ const docTemplate = `{
                 "tags": [
                     "Exchange"
                 ],
-                "summary": "Create Exchange",
+                "summary": "名刺交換",
                 "parameters": [
                     {
                         "description": "Exchange request body",
@@ -94,7 +132,7 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
-                "description": "Get the information of the authenticated user",
+                "description": "自分の情報を取得する",
                 "consumes": [
                     "application/json"
                 ],
@@ -104,7 +142,7 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Get user information",
+                "summary": "自分の情報",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -152,6 +190,28 @@ const docTemplate = `{
                 },
                 "user_id_2": {
                     "type": "string"
+                }
+            }
+        },
+        "schema.Exchange": {
+            "type": "object",
+            "properties": {
+                "event_id": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "schema.GetExchangesOutput": {
+            "type": "object",
+            "properties": {
+                "exchanges": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.Exchange"
+                    }
                 }
             }
         },

@@ -10,7 +10,7 @@ import (
 
 type IExchangeService interface {
 	Create(ctx context.Context, input *schema.CreateExchangeInput) error
-	GetByID(ctx context.Context, userID string) ([]entity.Exchange, error)
+	GetByID(ctx context.Context, userID string) (*schema.GetExchangesOutput, error)
 }
 
 type Service struct {
@@ -35,10 +35,27 @@ func (s *Service) Create(ctx context.Context, input *schema.CreateExchangeInput)
 	return nil
 }
 
-func (s *Service) GetByID(ctx context.Context, userID string) ([]entity.Exchange, error) {
+func (s *Service) GetByID(ctx context.Context, userID string) (*schema.GetExchangesOutput, error) {
 	exchanges, err := s.exchangeRepo.SelectAllByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	return exchanges, nil
+	output := make([]schema.Exchange, 0)
+	for _, exchange := range exchanges {
+		if exchange.User1ID == userID {
+			output = append(output, schema.Exchange{
+				UserID:  exchange.User2ID,
+				EventID: exchange.EventID,
+			})
+		} else {
+			output = append(output, schema.Exchange{
+				UserID:  exchange.User1ID,
+				EventID: exchange.EventID,
+			})
+		}
+	}
+
+	return &schema.GetExchangesOutput{
+		Exchanges: output,
+	}, nil
 }

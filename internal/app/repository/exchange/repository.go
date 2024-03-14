@@ -49,7 +49,7 @@ func (r *repository) SelectAllByUserID(ctx context.Context, userID string) ([]en
 
 	rows, err := r.conn.QueryxContext(ctx, `
 		SELECT user_id_1, user_id_2, event_id FROM exchanges
-		WHERE user_id_1 = $1 OR user_id_2 = $1
+		WHERE user_id_1 = ? OR user_id_2 = ?
 	`, userID, userID)
 	if err != nil {
 		return nil, errors.HandleError(err)
