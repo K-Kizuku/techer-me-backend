@@ -25,3 +25,5 @@ go.work
 firebase-sdk.json
 key.json
 cloud-sql-proxy
+
+/tmp

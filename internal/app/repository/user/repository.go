@@ -4,10 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"net/http"
 
 	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/dto"
 	"github.com/K-Kizuku/techer-me-backend/internal/domain/entity"
 	"github.com/K-Kizuku/techer-me-backend/internal/domain/repository/user"
+	"github.com/K-Kizuku/techer-me-backend/pkg/errors"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -28,7 +30,7 @@ func (r *repository) Create(ctx context.Context, id string) error {
 	`, id)
 
 	if err != nil {
-		return err
+		return errors.HandleError(err)
 	}
 	return nil
 }
@@ -36,12 +38,12 @@ func (r *repository) Create(ctx context.Context, id string) error {
 func (r *repository) CreateDetail(ctx context.Context, user *entity.User) error {
 	urls, err := json.Marshal(user.URLs)
 	if err != nil {
-		return err
+		return errors.New(http.StatusInternalServerError, err)
 	}
 
 	skills, err := json.Marshal(user.Skills)
 	if err != nil {
-		return err
+		return errors.New(http.StatusInternalServerError, err)
 	}
 
 	var message sql.Null[string]
@@ -63,7 +65,7 @@ func (r *repository) CreateDetail(ctx context.Context, user *entity.User) error 
 	`, u)
 
 	if err != nil {
-		return err
+		return errors.HandleError(err)
 	}
 	return nil
 }
@@ -73,17 +75,17 @@ func (r *repository) SelectByID(ctx context.Context, userID string) (*entity.Use
 	if err := r.conn.QueryRowxContext(ctx, `
 			SELECT user_id, name, is_organizer, image_url, urls, skills, message FROM user_details WHERE user_id = ?
 		`, userID).StructScan(&u); err != nil {
-		return nil, err
+		return nil, errors.HandleError(err)
 	}
 
 	urls := make(map[entity.URLs]string)
 	if err := json.Unmarshal([]byte(u.URLs), &urls); err != nil {
-		return nil, err
+		return nil, errors.New(http.StatusInternalServerError, err)
 	}
 
 	skills := make(map[string]string)
 	if err := json.Unmarshal([]byte(u.Skills), &skills); err != nil {
-		return nil, err
+		return nil, errors.New(http.StatusInternalServerError, err)
 	}
 
 	var message string
