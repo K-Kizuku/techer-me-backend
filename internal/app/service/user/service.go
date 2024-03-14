@@ -9,7 +9,7 @@ import (
 
 type IUserService interface {
 	CreateUserByFirebaseID(ctx context.Context, firebaseID string) error
-	GetByID(ctx context.Context, userID string) (*entity.User, error)
+	CreateUserDetailByFirebaseID(ctx context.Context, firebaseID string, name string, imageURL string) error
 }
 
 type Service struct {
@@ -29,10 +29,14 @@ func (s *Service) CreateUserByFirebaseID(ctx context.Context, firebaseID string)
 	return nil
 }
 
-func (s *Service) GetByID(ctx context.Context, userID string) (*entity.User, error) {
-	user, err := s.userRepo.SelectByID(ctx, userID)
-	if err != nil {
-		return nil, err
+func (s *Service) CreateUserDetailByFirebaseID(ctx context.Context, firebaseID string, name string, imageURL string) error {
+	user := &entity.User{
+		ID:       firebaseID,
+		Name:     name,
+		ImageURL: imageURL,
 	}
-	return user, nil
+	if err := s.userRepo.CreateDetail(ctx, user); err != nil {
+		return err
+	}
+	return nil
 }

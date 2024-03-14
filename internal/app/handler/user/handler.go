@@ -32,6 +32,10 @@ func (h *Handler) CreateUserByFirebaseID() func(http.ResponseWriter, *http.Reque
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return err
 		}
+		if err := h.userService.CreateUserDetailByFirebaseID(r.Context(), req.UserID, req.Name, req.ImageURL); err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return err
+		}
 		w.WriteHeader(http.StatusCreated)
 
 		fmt.Fprint(w, "OK")
