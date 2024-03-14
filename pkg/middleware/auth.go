@@ -41,9 +41,6 @@ func FirebaseAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		// type Key string
-		// const userIDKey Key = "userID"
-
 		// Token is valid, attach user information to the context
 		ctx = context.WithValue(ctx, UserIDKey, token.UID)
 		next.ServeHTTP(w, r.WithContext(ctx))

@@ -53,7 +53,7 @@ func main() {
 	go func() {
 		log.Start()
 		if err := server.ListenAndServe(); err != nil {
-			slog.Error("server error", "error", err.Error())
+			slog.Error("server error", "error", err)
 		}
 	}()
 
