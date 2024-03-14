@@ -25,9 +25,9 @@ func New(conn *sqlx.DB) user.IRepository {
 
 func (r *repository) Create(ctx context.Context, id string) error {
 	_, err := r.conn.ExecContext(ctx, `
-		INSERT INTO users (user_id)
-		VALUES (?)
-	`, id)
+        INSERT INTO users (user_id)
+        VALUES (?)
+    `, id)
 
 	if err != nil {
 		return errors.HandleError(err)
@@ -36,12 +36,14 @@ func (r *repository) Create(ctx context.Context, id string) error {
 }
 
 func (r *repository) CreateDetail(ctx context.Context, user *entity.User) error {
-	urls, err := json.Marshal(user.URLs)
+	urls := make(map[string]string)
+	urlsJSON, err := json.Marshal(urls)
 	if err != nil {
 		return errors.New(http.StatusInternalServerError, err)
 	}
 
-	skills, err := json.Marshal(user.Skills)
+	skills := make(map[string]string)
+	skillsJSON, err := json.Marshal(skills)
 	if err != nil {
 		return errors.New(http.StatusInternalServerError, err)
 	}
@@ -50,18 +52,17 @@ func (r *repository) CreateDetail(ctx context.Context, user *entity.User) error 
 	message.V = user.Message
 
 	u := &dto.User{
-		UserID:      user.ID,
-		Name:        user.Name,
-		IsOrganizer: user.IsOrganizer,
-		ImageURL:    user.ImageURL,
-		Message:     message,
-		Skills:      string(skills),
-		URLs:        string(urls),
+		UserID:   user.ID,
+		Name:     user.Name,
+		ImageURL: user.ImageURL,
+		Message:  message,
+		Skills:   string(skillsJSON),
+		URLs:     string(urlsJSON),
 	}
 
 	_, err = r.conn.NamedExecContext(ctx, `
-		INSERT INTO user_details (user_id, name, is_organizer, image_url, message, skills, urls)
-		VALUES (:user_id, :name, :is_organizer, :image_url, :message, :skills, :urls)
+		INSERT INTO user_details (user_id, name, image_url, message, skills, urls)
+		VALUES (:user_id, :name, :image_url, :message, :skills, :urls)
 	`, u)
 
 	if err != nil {
@@ -107,7 +108,6 @@ func (r *repository) SelectByID(ctx context.Context, userID string) (*entity.Use
 
 	return user, nil
 }
-
 func (r *repository) Update(ctx context.Context, user *entity.User) error {
 	return nil
 }
