@@ -49,7 +49,7 @@ func main() {
 	})
 
 	mux.HandleFunc("GET /swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8080/swagger/doc.json"), //The url pointing to API definition
+		httpSwagger.URL("https://server-u7kyixk36q-an.a.run.app/swagger/doc.json"), //The url pointing to API definition
 	))
 
 	// mux.HandleFunc("GET /ping", func(w http.ResponseWriter, r *http.Request) {
