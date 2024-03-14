@@ -50,7 +50,7 @@ func (r *repository) CreateDetail(ctx context.Context, user *entity.User) error 
 	}
 
 	_, err := r.conn.NamedExecContext(ctx, `
-        INSERT INTO user_detail (user_id, name, image_url, message, skills, urls)
+        INSERT INTO user_details (user_id, name, image_url, message, skills, urls)
         VALUES (:user_id, :name, :image_url, :message, :skills, :urls)
     `, u)
 
@@ -97,7 +97,6 @@ func (r *repository) SelectByID(ctx context.Context, userID string) (*entity.Use
 
 	return user, nil
 }
-
 func (r *repository) Update(ctx context.Context, user *entity.User) error {
 	return nil
 }
