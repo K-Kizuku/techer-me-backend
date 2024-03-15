@@ -69,7 +69,7 @@ func main() {
 	mux.Handle("PUT /me", middleware.FirebaseAuth(handler.AppHandler(h.UserHandler.Update())))
 
 	mux.Handle("POST /exchanges", middleware.FirebaseAuth(handler.AppHandler(h.ExchangeHandler.CreateExchange())))
-	// mux.Handle("GET /exchanges", middleware.FirebaseAuth(handler.AppHandler(h.ExchangeHandler.GetExchanges())))
+	mux.Handle("GET /exchanges", middleware.FirebaseAuth(handler.AppHandler(h.ExchangeHandler.GetExchanges())))
 
 	mux.Handle("POST /events", middleware.FirebaseAuth(handler.AppHandler(h.EventHandler.Create())))
 	mux.Handle("POST /events/join/{event_id}", middleware.FirebaseAuth(handler.AppHandler(h.EventHandler.Join())))
