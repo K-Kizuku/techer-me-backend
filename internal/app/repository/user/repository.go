@@ -91,9 +91,9 @@ func (r *repository) SelectByID(ctx context.Context, userID string) (*entity.Use
 
 	var userMessage string
 	if u.Message.Valid {
-		userMessage = ""
-	} else {
 		userMessage = u.Message.V
+	} else {
+		userMessage = ""
 	}
 
 	events := make([]entity.Event, 0)
@@ -139,6 +139,32 @@ func (r *repository) SelectByID(ctx context.Context, userID string) (*entity.Use
 
 	return user, nil
 }
+
 func (r *repository) Update(ctx context.Context, user *entity.User) error {
+	urlsJSON, err := json.Marshal(user.URLs)
+	if err != nil {
+		return errors.New(http.StatusInternalServerError, err)
+	}
+	skills, err := json.Marshal(user.Skills)
+	if err != nil {
+		return errors.New(http.StatusInternalServerError, err)
+	}
+	message := sql.Null[string]{V: user.Message, Valid: true}
+	u := &dto.User{
+		UserID:   user.ID,
+		Name:     user.Name,
+		ImageURL: user.ImageURL,
+		Message:  message,
+		Skills:   string(skills),
+		URLs:     string(urlsJSON),
+	}
+
+	_, err = r.conn.NamedExecContext(ctx, `
+		UPDATE user_details SET name = :name, image_url = :image_url, message = :message, skills = :skills, urls = :urls WHERE user_id = :user_id
+	`, u)
+	if err != nil {
+		return errors.HandleError(err)
+	}
+
 	return nil
 }
