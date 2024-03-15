@@ -329,7 +329,7 @@ paths:
       summary: ユーザー情報更新
       tags:
       - User
-  /user:
+  /users:
     get:
       consumes:
       - application/json

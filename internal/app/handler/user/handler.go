@@ -105,14 +105,11 @@ func (h *Handler) GetMe() func(http.ResponseWriter, *http.Request) error {
 // @Failure 404 {string} string "Not Found"
 // @Failure 500 {string} string "Internal Server Error"
 // @Security Bearer
-// @Router /user [get]
+// @Router /users [get]
 func (h *Handler) GetByID() func(http.ResponseWriter, *http.Request) error {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		var req schema.GetByIDInput
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			return errors.New(http.StatusBadRequest, err)
-		}
-		user, err := h.userService.GetByID(r.Context(), req.UserID)
+		userID := r.PathValue("user_id")
+		user, err := h.userService.GetByID(r.Context(), userID)
 		if err != nil {
 			return err
 		}
