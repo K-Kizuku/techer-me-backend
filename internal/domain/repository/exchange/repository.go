@@ -8,5 +8,5 @@ import (
 
 type IRepository interface {
 	Create(ctx context.Context, exchange entity.Exchange) error
-	SelectAllByUserID(ctx context.Context, userID string) ([]entity.Exchange, error)
+	SelectAllByUserID(ctx context.Context, userID string) ([]entity.ExchangeUser, error)
 }

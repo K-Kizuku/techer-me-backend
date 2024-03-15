@@ -344,6 +344,58 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/users/events": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "自分の開催したイベント情報を取得する",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "自分のイベント情報取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schema.GetEventByIDOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -390,8 +442,29 @@ const docTemplate = `{
         "schema.Exchange": {
             "type": "object",
             "properties": {
-                "event_id": {
+                "image_url": {
                     "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "skills": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "times": {
+                    "type": "integer"
+                },
+                "urls": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 },
                 "user_id": {
                     "type": "string"
@@ -444,6 +517,17 @@ const docTemplate = `{
                 }
             }
         },
+        "schema.GetEventByIDOutput": {
+            "type": "object",
+            "properties": {
+                "events": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.Event"
+                    }
+                }
+            }
+        },
         "schema.GetExchangesOutput": {
             "type": "object",
             "properties": {
@@ -451,6 +535,12 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/schema.Exchange"
+                    }
+                },
+                "stickers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/schema.Sticker"
                     }
                 }
             }
@@ -493,6 +583,23 @@ const docTemplate = `{
                 }
             }
         },
+        "schema.Sticker": {
+            "type": "object",
+            "properties": {
+                "image_url": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "x": {
+                    "type": "number"
+                },
+                "y": {
+                    "type": "number"
+                }
+            }
+        },
         "schema.UpdateUserInput": {
             "type": "object",
             "properties": {
@@ -519,9 +626,6 @@ const docTemplate = `{
                     "additionalProperties": {
                         "type": "string"
                     }
-                },
-                "user_id": {
-                    "type": "string"
                 }
             }
         }

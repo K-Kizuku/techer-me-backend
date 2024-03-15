@@ -2,6 +2,8 @@ package exchange
 
 import (
 	"context"
+	"encoding/json"
+
 	"net/http"
 
 	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/dto"
@@ -9,6 +11,7 @@ import (
 	"github.com/K-Kizuku/techer-me-backend/internal/domain/repository/exchange"
 	"github.com/K-Kizuku/techer-me-backend/pkg/errors"
 	"github.com/jmoiron/sqlx"
+	"golang.org/x/exp/maps"
 )
 
 type repository struct {
@@ -44,8 +47,8 @@ func (r *repository) Create(ctx context.Context, exchange entity.Exchange) error
 	return nil
 }
 
-func (r *repository) SelectAllByUserID(ctx context.Context, userID string) ([]entity.Exchange, error) {
-	exchanges := make([]entity.Exchange, 0)
+func (r *repository) SelectAllByUserID(ctx context.Context, userID string) ([]entity.ExchangeUser, error) {
+	exchanges := make([]entity.ExchangeUser, 0)
 
 	rows, err := r.conn.QueryxContext(ctx, `
 		SELECT user_id_1, user_id_2, event_id FROM exchanges
@@ -54,15 +57,68 @@ func (r *repository) SelectAllByUserID(ctx context.Context, userID string) ([]en
 	if err != nil {
 		return nil, errors.HandleError(err)
 	}
+	userMap := make(map[string]int)
 	for rows.Next() {
 		var e dto.Exchange
 		if err := rows.StructScan(&e); err != nil {
 			return nil, errors.New(http.StatusInternalServerError, err)
 		}
-		exchanges = append(exchanges, entity.Exchange{
-			User1ID: e.User1ID,
-			User2ID: e.User2ID,
-			EventID: e.EventID,
+		if e.User1ID == userID {
+			if _, ok := userMap[e.User2ID]; !ok {
+
+				userMap[e.User2ID] = 1
+			} else {
+				userMap[e.User2ID]++
+			}
+		} else {
+			if _, ok := userMap[e.User1ID]; !ok {
+				userMap[e.User1ID] = 1
+			} else {
+				userMap[e.User1ID]++
+			}
+		}
+	}
+	userList := maps.Keys(userMap)
+	if len(userList) == 0 {
+		return exchanges, nil
+	}
+	q, params, err := sqlx.In(`
+		SELECT user_id, name, image_url, message, skills, urls FROM user_details WHERE user_id IN (?)
+	`, userList)
+	if err != nil {
+		return nil, errors.New(http.StatusInternalServerError, err)
+	}
+	rows2, err := r.conn.QueryxContext(ctx, q, params...)
+	if err != nil {
+		return nil, errors.HandleError(err)
+	}
+	for rows2.Next() {
+		var u dto.User
+		if err := rows2.StructScan(&u); err != nil {
+			return nil, errors.New(http.StatusInternalServerError, err)
+		}
+		urls := make(map[entity.URLs]string)
+		if err := json.Unmarshal([]byte(u.URLs), &urls); err != nil {
+			return nil, errors.New(http.StatusInternalServerError, err)
+		}
+		skills := make(map[string]string)
+		if err := json.Unmarshal([]byte(u.Skills), &skills); err != nil {
+			return nil, errors.New(http.StatusInternalServerError, err)
+		}
+		var userMessage string
+		if u.Message.Valid {
+			userMessage = u.Message.V
+		} else {
+			userMessage = ""
+		}
+		exchanges = append(exchanges, entity.ExchangeUser{
+			UserID:   u.UserID,
+			Name:     u.Name,
+			ImageURL: u.ImageURL,
+			Message:  userMessage,
+			Skills:   skills,
+			URLs:     urls,
+			Times:    userMap[u.UserID],
 		})
 	}
 	return exchanges, nil
