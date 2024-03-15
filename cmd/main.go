@@ -66,6 +66,7 @@ func main() {
 
 	mux.Handle("GET /me", middleware.FirebaseAuth(handler.AppHandler(h.UserHandler.GetMe())))
 	mux.Handle("GET /users", middleware.FirebaseAuth(handler.AppHandler(h.UserHandler.GetByID())))
+	mux.Handle("PUT /me", middleware.FirebaseAuth(handler.AppHandler(h.UserHandler.Update())))
 	mux.Handle("GET /users/events", middleware.FirebaseAuth(handler.AppHandler(h.UserHandler.GetEventByID())))
 
 	mux.Handle("POST /exchanges", middleware.FirebaseAuth(handler.AppHandler(h.ExchangeHandler.CreateExchange())))
