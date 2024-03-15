@@ -11,4 +11,5 @@ type IRepository interface {
 	CreateDetail(ctx context.Context, user *entity.User) error
 	SelectByID(ctx context.Context, userID string) (*entity.User, error)
 	Update(ctx context.Context, user *entity.User) error
+	SelectEventByID(ctx context.Context, userID string) ([]entity.Event, error)
 }

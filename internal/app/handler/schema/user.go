@@ -54,6 +54,10 @@ type GetByIDOutput struct {
 	Events      []Event                `json:"events"`
 }
 
+type GetEventByIDOutput struct {
+	Events []Event `json:"events"`
+}
+
 type UpdateUserInput struct {
 	Name        string                 `json:"name"`
 	IsOrganizer bool                   `json:"is_organizer"`
