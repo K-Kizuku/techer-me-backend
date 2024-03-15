@@ -53,3 +53,7 @@ type GetByIDOutput struct {
 	URLs        map[entity.URLs]string `json:"urls"`
 	Events      []Event                `json:"events"`
 }
+
+type GetEventByIDOutput struct {
+	Events []Event `json:"events"`
+}

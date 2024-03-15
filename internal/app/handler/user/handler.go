@@ -145,3 +145,32 @@ func (h *Handler) GetByID() func(http.ResponseWriter, *http.Request) error {
 	}
 
 }
+
+func (h *Handler) GetEventByID() func(http.ResponseWriter, *http.Request) error {
+	return func(w http.ResponseWriter, r *http.Request) error {
+
+		userID := r.Context().Value(middleware.UserIDKey).(string)
+
+		events, err := h.userService.GetEventByID(r.Context(), userID)
+		if err != nil {
+			return err
+		}
+		var res schema.GetEventByIDOutput
+		res.Events = make([]schema.Event, 0)
+		for _, event := range events {
+			res.Events = append(res.Events, schema.Event{
+				EventID:    event.ID,
+				Name:       event.Name,
+				OwnerID:    event.OwnerID,
+				StartedAt:  event.StartedAt,
+				FinishedAt: event.FinishedAt,
+				Message:    event.Message,
+				ImageURL:   event.ImageURL,
+			})
+		}
+		if err := json.NewEncoder(w).Encode(res); err != nil {
+			return errors.New(http.StatusInternalServerError, err)
+		}
+		return nil
+	}
+}

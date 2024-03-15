@@ -12,6 +12,7 @@ type IUserService interface {
 	CreateUserByFirebaseID(ctx context.Context, firebaseID string) error
 	CreateUserDetailByFirebaseID(ctx context.Context, input schema.CreateUserInput) error
 	GetByID(ctx context.Context, userID string) (*entity.User, error)
+	GetEventByID(ctx context.Context, userID string) ([]entity.Event, error)
 }
 
 type Service struct {
@@ -49,4 +50,12 @@ func (s *Service) GetByID(ctx context.Context, userID string) (*entity.User, err
 		return nil, err
 	}
 	return user, nil
+}
+
+func (s *Service) GetEventByID(ctx context.Context, userID string) ([]entity.Event, error) {
+	events, err := s.userRepo.SelectEventByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	return events, nil
 }

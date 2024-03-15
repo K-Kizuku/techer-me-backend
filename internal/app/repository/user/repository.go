@@ -142,3 +142,37 @@ func (r *repository) SelectByID(ctx context.Context, userID string) (*entity.Use
 func (r *repository) Update(ctx context.Context, user *entity.User) error {
 	return nil
 }
+
+func (r *repository) SelectEventByID(ctx context.Context, userID string) ([]entity.Event, error) {
+	events := make([]entity.Event, 0)
+
+	rows, err := r.conn.QueryxContext(ctx, `
+	SELECT event_id, owner_id, started_at, finished_at, message, image_url FROM event_details JOIN participants USING(event_id) WHERE user_id = ?;
+	`, userID)
+	if err != nil {
+		return nil, errors.HandleError(err)
+	}
+	for rows.Next() {
+		var e dto.Event
+		if err := rows.StructScan(&e); err != nil {
+			return nil, errors.New(http.StatusInternalServerError, err)
+		}
+		var eventMessage string
+		if e.Message.Valid {
+			eventMessage = ""
+		} else {
+			eventMessage = e.Message.V
+		}
+		events = append(events, entity.Event{
+			ID:         e.EventID,
+			Name:       e.Name,
+			OwnerID:    e.OwnerID,
+			StartedAt:  e.StartedAt,
+			FinishedAt: e.FinishedAt,
+			Message:    eventMessage,
+			ImageURL:   e.ImageURL,
+		})
+	}
+
+	return events, nil
+}
