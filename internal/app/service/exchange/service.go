@@ -42,20 +42,19 @@ func (s *Service) GetByID(ctx context.Context, userID string) (*schema.GetExchan
 	}
 	output := make([]schema.Exchange, 0)
 	for _, exchange := range exchanges {
-		if exchange.User1ID == userID {
-			output = append(output, schema.Exchange{
-				UserID:  exchange.User2ID,
-				EventID: exchange.EventID,
-			})
-		} else {
-			output = append(output, schema.Exchange{
-				UserID:  exchange.User1ID,
-				EventID: exchange.EventID,
-			})
-		}
+		output = append(output, schema.Exchange{
+			UserID:   exchange.UserID,
+			Name:     exchange.Name,
+			ImageURL: exchange.ImageURL,
+			Message:  exchange.Message,
+			Skills:   exchange.Skills,
+			URLs:     exchange.URLs,
+			Times:    exchange.Times,
+		})
 	}
-
+	sticker := make([]schema.Sticker, 0)
 	return &schema.GetExchangesOutput{
 		Exchanges: output,
+		Stickers:  sticker,
 	}, nil
 }
