@@ -146,6 +146,18 @@ func (h *Handler) GetByID() func(http.ResponseWriter, *http.Request) error {
 
 }
 
+// @Summary 自分のイベント情報取得
+// @Description 自分の開催したイベント情報を取得する
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} schema.GetEventByIDOutput "OK"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Security Bearer
+// @Router /users/events [get]
 func (h *Handler) GetEventByID() func(http.ResponseWriter, *http.Request) error {
 	return func(w http.ResponseWriter, r *http.Request) error {
 
