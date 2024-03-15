@@ -276,7 +276,7 @@
                 }
             }
         },
-        "/user": {
+        "/users": {
             "get": {
                 "security": [
                     {

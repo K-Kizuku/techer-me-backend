@@ -282,7 +282,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user": {
+        "/users": {
             "get": {
                 "security": [
                     {
