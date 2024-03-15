@@ -1,9 +1,11 @@
 package event
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/K-Kizuku/techer-me-backend/internal/app/handler/schema"
 	"github.com/K-Kizuku/techer-me-backend/internal/app/service/event"
 	"github.com/K-Kizuku/techer-me-backend/pkg/errors"
 	"github.com/K-Kizuku/techer-me-backend/pkg/middleware"
@@ -17,6 +19,44 @@ func New(eventService event.IEventService) *Handler {
 	return &Handler{
 		eventService: eventService,
 	}
+}
+
+// @Summary イベント作成
+// @Description イベントを新規作成するエンドポイント
+// @Tags Event
+// @Accept json
+// @Produce json
+// @Param event_id query string true "Event ID"
+// @Success 201 {string} string "OK"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /event [post]
+func (h *Handler) Create() func(http.ResponseWriter, *http.Request) error {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		var req schema.CreateEventInput
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			return errors.New(http.StatusBadRequest, err)
+		}
+		if err := h.eventService.Create(r.Context(), &req); err != nil {
+			return err
+		}
+		return nil
+	}
+	/*
+			        return func(w http.ResponseWriter, r *http.Request) error {
+		                var req schema.CreateExchangeInput
+		                if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		                        return errors.New(http.StatusBadRequest, err)
+		                }
+		                if err := h.exchangeService.Create(r.Context(), &req); err != nil {
+		                        return err
+		                }
+		                w.WriteHeader(http.StatusCreated)
+
+		                fmt.Fprint(w, "OK")
+		                return nil
+		        }
+	*/
 }
 
 // @Summary Join an event

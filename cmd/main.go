@@ -49,7 +49,7 @@ func main() {
 	})
 
 	mux.HandleFunc("GET /swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("https://server-u7kyixk36q-an.a.run.app/swagger/doc.json"), //The url pointing to API definition
+		httpSwagger.URL("https://server-u7kyixk36q-an.a.run.app/swagger/doc.json"), // The url pointing to API definition
 	))
 
 	// mux.HandleFunc("GET /ping", func(w http.ResponseWriter, r *http.Request) {
@@ -69,9 +69,11 @@ func main() {
 	mux.Handle("PUT /me", middleware.FirebaseAuth(handler.AppHandler(h.UserHandler.Update())))
 
 	mux.Handle("POST /exchanges", middleware.FirebaseAuth(handler.AppHandler(h.ExchangeHandler.CreateExchange())))
-	mux.Handle("GET /exchanges", middleware.FirebaseAuth(handler.AppHandler(h.ExchangeHandler.GetExchanges())))
+	// mux.Handle("GET /exchanges", middleware.FirebaseAuth(handler.AppHandler(h.ExchangeHandler.GetExchanges())))
 
+	mux.Handle("POST /events", middleware.FirebaseAuth(handler.AppHandler(h.EventHandler.Create())))
 	mux.Handle("POST /events/join/{event_id}", middleware.FirebaseAuth(handler.AppHandler(h.EventHandler.Join())))
+	// mux.Handle("GET /events", middleware.FirebaseAuth(handler.AppHandler(h.EventHandler.Get())))
 
 	c := cors.AllowAll()
 	handler := middleware.Chain(mux, middleware.Context, c.Handler, middleware.Recover, middleware.Logger)
