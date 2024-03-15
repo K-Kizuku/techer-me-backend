@@ -79,6 +79,9 @@ func (r *repository) SelectAllByUserID(ctx context.Context, userID string) ([]en
 		}
 	}
 	userList := maps.Keys(userMap)
+	if len(userList) == 0 {
+		return exchanges, nil
+	}
 	q, params, err := sqlx.In(`
 		SELECT user_id, name, image_url, message, skills, urls FROM user_details WHERE user_id IN (?)
 	`, userList)
