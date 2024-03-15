@@ -159,9 +159,9 @@ func (r *repository) SelectEventByID(ctx context.Context, userID string) ([]enti
 		}
 		var eventMessage string
 		if e.Message.Valid {
-			eventMessage = ""
-		} else {
 			eventMessage = e.Message.V
+		} else {
+			eventMessage = ""
 		}
 		events = append(events, entity.Event{
 			ID:         e.EventID,
