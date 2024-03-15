@@ -10,8 +10,9 @@ import (
 
 type IUserService interface {
 	CreateUserByFirebaseID(ctx context.Context, firebaseID string) error
-	CreateUserDetailByFirebaseID(ctx context.Context, input schema.CreateUserInput) error
+	CreateUserDetailByFirebaseID(ctx context.Context, input *schema.CreateUserInput) error
 	GetByID(ctx context.Context, userID string) (*entity.User, error)
+	Update(ctx context.Context, userID string, input *schema.UpdateUserInput) error
 }
 
 type Service struct {
@@ -31,7 +32,7 @@ func (s *Service) CreateUserByFirebaseID(ctx context.Context, firebaseID string)
 	return nil
 }
 
-func (s *Service) CreateUserDetailByFirebaseID(ctx context.Context, input schema.CreateUserInput) error {
+func (s *Service) CreateUserDetailByFirebaseID(ctx context.Context, input *schema.CreateUserInput) error {
 	user := &entity.User{
 		ID:       input.UserID,
 		Name:     input.Name,
@@ -49,4 +50,19 @@ func (s *Service) GetByID(ctx context.Context, userID string) (*entity.User, err
 		return nil, err
 	}
 	return user, nil
+}
+
+func (s *Service) Update(ctx context.Context, userID string, input *schema.UpdateUserInput) error {
+	user := &entity.User{
+		ID:       userID,
+		Name:     input.Name,
+		ImageURL: input.ImageURL,
+		Message:  input.Message,
+		Skills:   input.Skills,
+		URLs:     input.URLs,
+	}
+	if err := s.userRepo.Update(ctx, user); err != nil {
+		return err
+	}
+	return nil
 }

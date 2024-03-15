@@ -31,7 +31,7 @@ func (h *Handler) CreateUserByFirebaseID() func(http.ResponseWriter, *http.Reque
 		if err := h.userService.CreateUserByFirebaseID(r.Context(), req.UserID); err != nil {
 			return err
 		}
-		if err := h.userService.CreateUserDetailByFirebaseID(r.Context(), req); err != nil {
+		if err := h.userService.CreateUserDetailByFirebaseID(r.Context(), &req); err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return err
 		}
@@ -144,4 +144,32 @@ func (h *Handler) GetByID() func(http.ResponseWriter, *http.Request) error {
 		return nil
 	}
 
+}
+
+// @Summary ユーザー情報更新
+// @Description ユーザー情報を更新する
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user body schema.UpdateUserInput true "更新するユーザー情報(更新後の情報を全て含む必要があります)"
+// @Success 200 {string} string "OK"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Security Bearer
+// @Router /me [put]
+func (h *Handler) Update() func(http.ResponseWriter, *http.Request) error {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		var req schema.UpdateUserInput
+		userID := r.Context().Value(middleware.UserIDKey).(string)
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			return errors.New(http.StatusBadRequest, err)
+		}
+		if err := h.userService.Update(r.Context(), userID, &req); err != nil {
+			return err
+		}
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
 }
