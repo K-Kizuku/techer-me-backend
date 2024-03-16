@@ -19,6 +19,17 @@ func New(imageService image.IImageService) *Handler {
 	}
 }
 
+// @Summary Generate signed URL
+// @Description Generate signed URL for uploading image
+// @Tags Image
+// @Accept json
+// @Produce json
+// @Param generateImage body schema.GenerateImageInput true "Generate image request body"
+// @Success 200 {object} schema.GenerateImageOutput "OK"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 500 {string} string "Internal Server Error"
+// @Security Bearer
+// @Router /images/signed-url [post]
 func (h *Handler) GenerateSignedURL() func(http.ResponseWriter, *http.Request) error {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var req schema.GenerateImageInput
