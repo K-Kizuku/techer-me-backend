@@ -36,7 +36,13 @@ func (r *repository) Join(ctx context.Context, eventID string, userID string) er
 func (r *repository) Create(ctx context.Context, event *entity.Event) (string, error) {
 
 	var message sql.Null[string]
-	message.V = event.Message
+	if event.Message != "" {
+		message.V = event.Message
+		message.Valid = true
+	} else {
+		message.Valid = false
+
+	}
 	e := &dto.Event{
 		EventID:    event.ID,
 		Name:       event.Name,
