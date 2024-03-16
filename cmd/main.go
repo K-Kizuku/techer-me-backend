@@ -76,6 +76,8 @@ func main() {
 	mux.Handle("POST /events", middleware.FirebaseAuth(handler.AppHandler(h.EventHandler.Create())))
 	mux.Handle("GET /events/{event_id}", middleware.FirebaseAuth(handler.AppHandler(h.EventHandler.GetEventDetailByID())))
 
+	mux.Handle("GET /signed_url", middleware.FirebaseAuth(handler.AppHandler(h.ImageHandler.GenerateSignedURL())))
+
 	c := cors.AllowAll()
 	handler := middleware.Chain(mux, middleware.Context, c.Handler, middleware.Recover, middleware.Logger)
 

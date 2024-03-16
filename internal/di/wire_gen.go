@@ -10,12 +10,15 @@ import (
 	"github.com/K-Kizuku/techer-me-backend/internal/app/handler"
 	event3 "github.com/K-Kizuku/techer-me-backend/internal/app/handler/event"
 	exchange3 "github.com/K-Kizuku/techer-me-backend/internal/app/handler/exchange"
+	image3 "github.com/K-Kizuku/techer-me-backend/internal/app/handler/image"
 	user3 "github.com/K-Kizuku/techer-me-backend/internal/app/handler/user"
 	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/event"
 	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/exchange"
+	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/image"
 	"github.com/K-Kizuku/techer-me-backend/internal/app/repository/user"
 	event2 "github.com/K-Kizuku/techer-me-backend/internal/app/service/event"
 	exchange2 "github.com/K-Kizuku/techer-me-backend/internal/app/service/exchange"
+	image2 "github.com/K-Kizuku/techer-me-backend/internal/app/service/image"
 	user2 "github.com/K-Kizuku/techer-me-backend/internal/app/service/user"
 	"github.com/K-Kizuku/techer-me-backend/pkg/db"
 )
@@ -33,6 +36,9 @@ func InitHandler() *handler.Root {
 	eventIRepository := event.New(sqlxDB)
 	iEventService := event2.New(eventIRepository)
 	eventHandler := event3.New(iEventService)
-	root := handler.New(userHandler, exchangeHandler, eventHandler)
+	imageIRepository := image.New(sqlxDB)
+	iImageService := image2.New(imageIRepository)
+	imageHandler := image3.New(iImageService)
+	root := handler.New(userHandler, exchangeHandler, eventHandler, imageHandler)
 	return root
 }
