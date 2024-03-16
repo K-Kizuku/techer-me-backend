@@ -53,3 +53,16 @@ type GetByIDOutput struct {
 	URLs        map[entity.URLs]string `json:"urls"`
 	Events      []Event                `json:"events"`
 }
+
+type GetEventByIDOutput struct {
+	Events []Event `json:"events"`
+}
+
+type UpdateUserInput struct {
+	Name        string                 `json:"name"`
+	IsOrganizer bool                   `json:"is_organizer"`
+	ImageURL    string                 `json:"image_url"`
+	Message     string                 `json:"message"`
+	Skills      map[string]string      `json:"skills"`
+	URLs        map[entity.URLs]string `json:"urls"`
+}

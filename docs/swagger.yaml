@@ -28,8 +28,22 @@ definitions:
     type: object
   schema.Exchange:
     properties:
-      event_id:
+      image_url:
         type: string
+      message:
+        type: string
+      name:
+        type: string
+      skills:
+        additionalProperties:
+          type: string
+        type: object
+      times:
+        type: integer
+      urls:
+        additionalProperties:
+          type: string
+        type: object
       user_id:
         type: string
     type: object
@@ -63,11 +77,22 @@ definitions:
       user_id:
         type: string
     type: object
+  schema.GetEventByIDOutput:
+    properties:
+      events:
+        items:
+          $ref: '#/definitions/schema.Event'
+        type: array
+    type: object
   schema.GetExchangesOutput:
     properties:
       exchanges:
         items:
           $ref: '#/definitions/schema.Exchange'
+        type: array
+      stickers:
+        items:
+          $ref: '#/definitions/schema.Sticker'
         type: array
     type: object
   schema.GetMeOutput:
@@ -94,6 +119,36 @@ definitions:
         type: object
       user_id:
         type: string
+    type: object
+  schema.Sticker:
+    properties:
+      image_url:
+        type: string
+      user_id:
+        type: string
+      x:
+        type: number
+      "y":
+        type: number
+    type: object
+  schema.UpdateUserInput:
+    properties:
+      image_url:
+        type: string
+      is_organizer:
+        type: boolean
+      message:
+        type: string
+      name:
+        type: string
+      skills:
+        additionalProperties:
+          type: string
+        type: object
+      urls:
+        additionalProperties:
+          type: string
+        type: object
     type: object
 host: server-u7kyixk36q-an.a.run.app
 info:
@@ -235,7 +290,46 @@ paths:
       summary: 自分の情報
       tags:
       - User
-  /user:
+    put:
+      consumes:
+      - application/json
+      description: ユーザー情報を更新する
+      parameters:
+      - description: 更新するユーザー情報(更新後の情報を全て含む必要があります)
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/schema.UpdateUserInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: ユーザー情報更新
+      tags:
+      - User
+  /users:
     get:
       consumes:
       - application/json
@@ -273,6 +367,39 @@ paths:
       security:
       - Bearer: []
       summary: ユーザー情報取得
+      tags:
+      - User
+  /users/events:
+    get:
+      consumes:
+      - application/json
+      description: 自分の開催したイベント情報を取得する
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.GetEventByIDOutput'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Bearer: []
+      summary: 自分のイベント情報取得
       tags:
       - User
 securityDefinitions:

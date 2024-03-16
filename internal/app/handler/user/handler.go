@@ -31,7 +31,7 @@ func (h *Handler) CreateUserByFirebaseID() func(http.ResponseWriter, *http.Reque
 		if err := h.userService.CreateUserByFirebaseID(r.Context(), req.UserID); err != nil {
 			return err
 		}
-		if err := h.userService.CreateUserDetailByFirebaseID(r.Context(), req); err != nil {
+		if err := h.userService.CreateUserDetailByFirebaseID(r.Context(), &req); err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return err
 		}
@@ -105,14 +105,11 @@ func (h *Handler) GetMe() func(http.ResponseWriter, *http.Request) error {
 // @Failure 404 {string} string "Not Found"
 // @Failure 500 {string} string "Internal Server Error"
 // @Security Bearer
-// @Router /user [get]
+// @Router /users [get]
 func (h *Handler) GetByID() func(http.ResponseWriter, *http.Request) error {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		var req schema.GetByIDInput
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			return errors.New(http.StatusBadRequest, err)
-		}
-		user, err := h.userService.GetByID(r.Context(), req.UserID)
+		userID := r.PathValue("user_id")
+		user, err := h.userService.GetByID(r.Context(), userID)
 		if err != nil {
 			return err
 		}
@@ -144,4 +141,73 @@ func (h *Handler) GetByID() func(http.ResponseWriter, *http.Request) error {
 		return nil
 	}
 
+}
+
+// @Summary ユーザー情報更新
+// @Description ユーザー情報を更新する
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param user body schema.UpdateUserInput true "更新するユーザー情報(更新後の情報を全て含む必要があります)"
+// @Success 200 {string} string "OK"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Security Bearer
+// @Router /me [put]
+func (h *Handler) Update() func(http.ResponseWriter, *http.Request) error {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		var req schema.UpdateUserInput
+		userID := r.Context().Value(middleware.UserIDKey).(string)
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			return errors.New(http.StatusBadRequest, err)
+		}
+		if err := h.userService.Update(r.Context(), userID, &req); err != nil {
+			return err
+		}
+		w.WriteHeader(http.StatusOK)
+		return nil
+	}
+}
+
+// @Summary 自分のイベント情報取得
+// @Description 自分の開催したイベント情報を取得する
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} schema.GetEventByIDOutput "OK"
+// @Failure 400 {string} string "Bad Request"
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 404 {string} string "Not Found"
+// @Failure 500 {string} string "Internal Server Error"
+// @Security Bearer
+// @Router /users/events [get]
+func (h *Handler) GetEventByID() func(http.ResponseWriter, *http.Request) error {
+	return func(w http.ResponseWriter, r *http.Request) error {
+
+		userID := r.Context().Value(middleware.UserIDKey).(string)
+
+		events, err := h.userService.GetEventByID(r.Context(), userID)
+		if err != nil {
+			return err
+		}
+		var res schema.GetEventByIDOutput
+		res.Events = make([]schema.Event, 0)
+		for _, event := range events {
+			res.Events = append(res.Events, schema.Event{
+				EventID:    event.ID,
+				Name:       event.Name,
+				OwnerID:    event.OwnerID,
+				StartedAt:  event.StartedAt,
+				FinishedAt: event.FinishedAt,
+				Message:    event.Message,
+				ImageURL:   event.ImageURL,
+			})
+		}
+		if err := json.NewEncoder(w).Encode(res); err != nil {
+			return errors.New(http.StatusInternalServerError, err)
+		}
+		return nil
+	}
 }
