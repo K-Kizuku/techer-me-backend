@@ -53,7 +53,7 @@ func (h *Handler) Join() func(http.ResponseWriter, *http.Request) error {
 // @Accept json
 // @Produce json
 // @Param event body schema.CreateEventInput true "Event request body"
-// @Success 201 {string} string "OK"
+// @Success 201 {object} schema.CreateEventOutput "OK"
 // @Failure 400 {string} string "Bad Request"
 // @Failure 500 {string} string "Internal Server Error"
 // @Router /events [post]
@@ -63,11 +63,18 @@ func (h *Handler) Create() func(http.ResponseWriter, *http.Request) error {
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			return errors.New(http.StatusBadRequest, err)
 		}
-		if err := h.eventService.Create(r.Context(), &req); err != nil {
+		eventID, err := h.eventService.Create(r.Context(), &req)
+		if err != nil {
 			return err
 		}
+		e := schema.CreateEventOutput{
+			EventID: eventID,
+		}
+
 		w.WriteHeader(http.StatusCreated)
-		fmt.Fprint(w, "OK")
+		if err := json.NewEncoder(w).Encode(e); err != nil {
+			return errors.New(http.StatusInternalServerError, err)
+		}
 		return nil
 	}
 }

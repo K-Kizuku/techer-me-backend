@@ -96,7 +96,7 @@ const docTemplate = `{
                     "201": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/schema.CreateEventOutput"
                         }
                     },
                     "400": {
@@ -559,6 +559,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "started_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "schema.CreateEventOutput": {
+            "type": "object",
+            "properties": {
+                "event_id": {
                     "type": "string"
                 }
             }
