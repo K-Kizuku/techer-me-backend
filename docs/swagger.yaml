@@ -1,5 +1,20 @@
 basePath: /
 definitions:
+  schema.CreateEventInput:
+    properties:
+      finished_at:
+        type: string
+      image_url:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      owner_id:
+        type: string
+      started_at:
+        type: string
+    type: object
   schema.CreateExchangeInput:
     properties:
       event_id:
@@ -83,6 +98,23 @@ definitions:
         items:
           $ref: '#/definitions/schema.Event'
         type: array
+    type: object
+  schema.GetEventDetailByIDOutput:
+    properties:
+      event_id:
+        type: string
+      finished_at:
+        type: string
+      image_url:
+        type: string
+      message:
+        type: string
+      name:
+        type: string
+      owner_id:
+        type: string
+      started_at:
+        type: string
     type: object
   schema.GetExchangesOutput:
     properties:
@@ -191,6 +223,65 @@ paths:
           schema:
             type: string
       summary: Join an event
+      tags:
+      - Event
+  /events:
+    post:
+      consumes:
+      - application/json
+      description: イベント作成のためのエンドポイント
+      parameters:
+      - description: Event request body
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/schema.CreateEventInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: イベント作成
+      tags:
+      - Event
+  /events/{event_id}:
+    get:
+      consumes:
+      - application/json
+      description: イベント詳細を取得する
+      parameters:
+      - description: Event ID
+        in: path
+        name: event_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schema.GetEventDetailByIDOutput'
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: イベント詳細の取得
       tags:
       - Event
   /exchanges:
