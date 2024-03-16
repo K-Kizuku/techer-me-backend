@@ -259,6 +259,57 @@ const docTemplate = `{
                 }
             }
         },
+        "/images/signed-url": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "Generate signed URL for uploading image",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Image"
+                ],
+                "summary": "Generate signed URL",
+                "parameters": [
+                    {
+                        "description": "Generate image request body",
+                        "name": "generateImage",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schema.GenerateImageInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schema.GenerateImageOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/me": {
             "get": {
                 "security": [
@@ -580,6 +631,25 @@ const docTemplate = `{
                     }
                 },
                 "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "schema.GenerateImageInput": {
+            "type": "object",
+            "properties": {
+                "object_name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "schema.GenerateImageOutput": {
+            "type": "object",
+            "properties": {
+                "url": {
                     "type": "string"
                 }
             }
