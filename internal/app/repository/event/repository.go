@@ -33,7 +33,7 @@ func (r *repository) Join(ctx context.Context, eventID string, userID string) er
 	return nil
 }
 
-func (r *repository) Create(ctx context.Context, event *entity.Event) error {
+func (r *repository) Create(ctx context.Context, event *entity.Event) (string, error) {
 
 	var message sql.Null[string]
 	message.V = event.Message
@@ -51,7 +51,7 @@ func (r *repository) Create(ctx context.Context, event *entity.Event) error {
 		INSERT INTO events (event_id)
 		VALUES (?)`, e.EventID)
 	if err != nil {
-		return errors.HandleError(err)
+		return "", errors.HandleError(err)
 	}
 
 	_, err = r.conn.NamedExecContext(ctx, `
@@ -60,9 +60,9 @@ func (r *repository) Create(ctx context.Context, event *entity.Event) error {
 	`, e)
 
 	if err != nil {
-		return errors.HandleError(err)
+		return "", errors.HandleError(err)
 	}
-	return nil
+	return event.ID, nil
 }
 
 func (r *repository) SelectByID(ctx context.Context, eventID string) (*entity.Event, error) {

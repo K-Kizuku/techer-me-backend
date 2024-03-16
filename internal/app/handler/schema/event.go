@@ -18,3 +18,7 @@ type GetEventDetailByIDOutput struct {
 	ImageURL   string `json:"image_url"`
 	OwnerID    string `json:"owner_id"`
 }
+
+type CreateEventOutput struct {
+	EventID string `json:"event_id"`
+}

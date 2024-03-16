@@ -15,6 +15,11 @@ definitions:
       started_at:
         type: string
     type: object
+  schema.CreateEventOutput:
+    properties:
+      event_id:
+        type: string
+    type: object
   schema.CreateExchangeInput:
     properties:
       event_id:
@@ -255,7 +260,7 @@ paths:
         "201":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/schema.CreateEventOutput'
         "400":
           description: Bad Request
           schema:

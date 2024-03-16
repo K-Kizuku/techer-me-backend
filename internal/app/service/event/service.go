@@ -13,7 +13,7 @@ import (
 
 type IEventService interface {
 	Join(ctx context.Context, eventID string, userID string) error
-	Create(ctx context.Context, input *schema.CreateEventInput) error
+	Create(ctx context.Context, input *schema.CreateEventInput) (string, error)
 	SelectByID(ctx context.Context, eventID string) (*schema.GetEventDetailByIDOutput, error)
 }
 
@@ -34,10 +34,10 @@ func (s *Service) Join(ctx context.Context, eventID string, userID string) error
 	return nil
 }
 
-func (s *Service) Create(ctx context.Context, input *schema.CreateEventInput) error {
+func (s *Service) Create(ctx context.Context, input *schema.CreateEventInput) (string, error) {
 	uuid, err := uuid.NewUUID()
 	if err != nil {
-		return errors.New(http.StatusInternalServerError, err)
+		return "", errors.New(http.StatusInternalServerError, err)
 	}
 	eventID := uuid.String()
 	event := &entity.Event{
@@ -49,10 +49,11 @@ func (s *Service) Create(ctx context.Context, input *schema.CreateEventInput) er
 		OwnerID:    input.OwnerID,
 		ImageURL:   input.ImageURL,
 	}
-	if err := s.eventRepo.Create(ctx, event); err != nil {
-		return err
+	eventID, err = s.eventRepo.Create(ctx, event)
+	if err != nil {
+		return "", err
 	}
-	return nil
+	return eventID, nil
 }
 
 func (s *Service) SelectByID(ctx context.Context, eventID string) (*schema.GetEventDetailByIDOutput, error) {
