@@ -15,6 +15,9 @@ var (
 	InstanceConnectionName       string
 	Mode                         string
 	GoogleApplicationCredentials string
+	GoogleAccessID               string
+	Name                         string
+	Basket                       string
 )
 
 // .envを呼び出します。
@@ -32,4 +35,7 @@ func LoadEnv() {
 	InstanceConnectionName = os.Getenv("INSTANCE_CONNECTION_NAME")
 	Mode = os.Getenv("MODE")
 	GoogleApplicationCredentials = os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
+	GoogleAccessID = os.Getenv("GOOGLE_ACCESS_ID")
+	Name = os.Getenv("NAME")
+	Basket = os.Getenv("BUCKET_NAME")
 }
