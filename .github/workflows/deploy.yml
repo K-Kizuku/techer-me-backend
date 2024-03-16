@@ -83,6 +83,6 @@ jobs:
             --set-env-vars DB_NAME=${{ env.MYSQL_DATABASE }} \
             --set-env-vars INSTANCE_CONNECTION_NAME=${{ env.CLOUDSQL_INSTANCE_CONNECTION_NAME }} \
             --set-env-vars MODE=prod
-            --set-nev-vars GOOGLE_ACCESS_TOKEN=${{ env.GOOGLE_ACCESS_TOKEN }} \
+            --set-env-vars GOOGLE_ACCESS_TOKEN=${{ env.GOOGLE_ACCESS_TOKEN }} \
             --set-env-vars NAME=${{ env.NAME }} \
             --set-env-vars BUCKET_NAME=${{ env.BUCKET_NAME }} \
